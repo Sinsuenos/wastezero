@@ -407,7 +407,7 @@ function App() {
   };
   const showNavbar = !['/', '/login', '/signup'].includes(location.pathname);
   return (
-    <BrowserRouter>
+    <>
       {showNavbar && <Navbar user={user} onLogout={handleLogout} />}
       <Routes>
         <Route path="/" element={<Landing />} />
@@ -419,7 +419,7 @@ function App() {
         <Route path="/orders" element={user ? <Orders user={user} /> : <Landing />} />
       </Routes>
       <Toaster position="top-right" />
-    </BrowserRouter>
+    </>
   );
 }
 
