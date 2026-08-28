@@ -43,6 +43,10 @@ export const api = {
   confirmOrder: (id) => request(`/orders/${id}/confirm`, { method: 'POST' }),
   completeOrder: (id) => request(`/orders/${id}/complete`, { method: 'PUT' }),
   getMyOrders: (id) => request(`/orders/user/${id}`),
+  getOrders: () => request('/orders'),
+
+  // Stripe
+  createPaymentIntent: (body) => request('/create-payment-intent', { method: 'POST', body: JSON.stringify(body) }),
 
   // Messages
   sendMessage: (body) => request('/messages', { method: 'POST', body: JSON.stringify(body) }),

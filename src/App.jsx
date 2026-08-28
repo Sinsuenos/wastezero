@@ -188,10 +188,23 @@ function Browse({ user }) {
   const handleBuy = async (listing) => {
     if (!user) { toast.error('Please login first'); return; }
     try {
-      await api.post('/api/orders', { listing_id: listing.id, quantity: 1 });
-      toast.success('Order placed! Check your orders page.');
+      // Try Stripe checkout first
+      const { url } = await api.createPaymentIntent({ listing_id: listing.id, quantity: 1 });
+      if (url) {
+        window.location.href = url;
+      } else {
+        // Fallback to demo order
+        await api.createOrder({ listing_id: listing.id, quantity: 1 });
+        toast.success('Order placed! Check your orders page.');
+      }
     } catch (err) {
-      toast.error(err.message || 'Failed to place order');
+      // Fallback to demo if Stripe not configured
+      try {
+        await api.createOrder({ listing_id: listing.id, quantity: 1 });
+        toast.success('Order placed (demo mode)! Check your orders page.');
+      } catch (e2) {
+        toast.error(e2.message || 'Failed to place order');
+      }
     }
   };
   return (
