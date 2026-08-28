@@ -1,9 +1,5 @@
 // Simple JSON-file database for Vercel serverless
-// Each cold start reads from /tmp/ (ephemeral) - good for demo/MVP
-// For production scale, swap with Vercel KV, Supabase, or MongoDB
-
 import fs from 'fs';
-import path from 'path';
 
 const DB_FILE = process.env.DB_PATH || '/tmp/wastezero-db.json';
 
@@ -41,12 +37,22 @@ export function uuid() {
   return Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
 
+// Simple password hash using built-in crypto (no bcrypt needed)
+import crypto from 'crypto';
+export function hashPassword(password) {
+  return crypto.createHash('sha256').update(password + 'wastezero-salt').digest('hex');
+}
+
+export function verifyPassword(password, hash) {
+  return hashPassword(password) === hash;
+}
+
 function seedDemo(db) {
   const merchantId = 'demo-merchant-1';
   const buyerId = 'demo-buyer-1';
   db.users.push(
-    { id: merchantId, email: 'baker@demo.com', password: 'demo123', name: 'Sam', role: 'merchant', business_name: "Sam's Artisan Bakery" },
-    { id: buyerId, email: 'cafe@demo.com', password: 'demo123', name: 'Maria', role: 'buyer', business_name: 'Cafe Maria' }
+    { id: merchantId, email: 'baker@demo.com', password: hashPassword('demo123'), name: 'Sam', role: 'merchant', business_name: "Sam's Artisan Bakery" },
+    { id: buyerId, email: 'cafe@demo.com', password: hashPassword('demo123'), name: 'Maria', role: 'buyer', business_name: 'Cafe Maria' }
   );
   db.listings.push(
     { id: 'l1', merchant_id: merchantId, title: 'Day-old sourdough bread', description: 'Fresh baked yesterday. 20 loaves. Perfect for sandwiches or toast.', category: 'baked', price: 15, quantity: 20, pickup_location: '123 Main St, Downtown', status: 'active' },
