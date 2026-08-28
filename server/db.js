@@ -2,7 +2,8 @@ import Database from 'better-sqlite3';
 import bcrypt from 'bcryptjs';
 import { v4 as uuid } from 'uuid';
 
-const db = new Database('wastezero.db');
+const DB_PATH = process.env.DB_PATH || (process.env.RAILWAY_VOLUME_MOUNT_PATH ? `${process.env.RAILWAY_VOLUME_MOUNT_PATH}/wastezero.db` : 'wastezero.db');
+const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
 
 // Create tables
