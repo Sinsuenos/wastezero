@@ -1,9 +1,6 @@
 {
-  "name": "wastezero-root",
+  "name": "wastezero",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "build": "cd server && npm install",
-    "start": "cd server && npm start"
-  }
+  "description": "B2B surplus food marketplace"
 }
