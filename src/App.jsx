@@ -1,28 +1,29 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
-import { toast, Toaster } from 'sonner';
+import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
 import { api } from './api';
 
+const STORE_KEY = 'wastezero_token';
+
 function Navbar({ user, onLogout }) {
-  const navigate = useNavigate();
   return (
-    <nav className="bg-green-600 text-white p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold">WasteZero</Link>
-        <div className="space-x-4">
+    <nav style={{ background: '#16a34a', color: 'white', padding: '16px 0' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Link to="/" style={{ color: 'white', textDecoration: 'none', fontSize: 24, fontWeight: 800 }}>WasteZero</Link>
+        <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
           {user ? (
             <>
-              <Link to="/browse" className="hover:underline">Browse</Link>
-              <Link to="/create" className="hover:underline">Sell Food</Link>
-              <Link to="/my-listings" className="hover:underline">My Listings</Link>
-              <Link to="/orders" className="hover:underline">Orders</Link>
-              <span className="text-green-200">({user.role})</span>
-              <button onClick={onLogout} className="bg-green-700 px-3 py-1 rounded hover:bg-green-800">Logout</button>
+              <Link to="/browse" style={{ color: 'white', textDecoration: 'none' }}>Browse</Link>
+              {user.role === 'merchant' && <Link to="/create" style={{ color: 'white', textDecoration: 'none' }}>Sell Food</Link>}
+              <Link to="/my-listings" style={{ color: 'white', textDecoration: 'none' }}>My Listings</Link>
+              <Link to="/orders" style={{ color: 'white', textDecoration: 'none' }}>Orders</Link>
+              <span style={{ color: '#bbf7d0', fontSize: 14 }}>({user.role})</span>
+              <button onClick={onLogout} style={{ background: '#15803d', color: 'white', border: 'none', padding: '6px 12px', borderRadius: 6, cursor: 'pointer' }}>Logout</button>
             </>
           ) : (
             <>
-              <Link to="/login" className="hover:underline">Login</Link>
-              <Link to="/signup" className="bg-white text-green-600 px-3 py-1 rounded hover:bg-green-100">Sign Up</Link>
+              <Link to="/login" style={{ color: 'white', textDecoration: 'none' }}>Login</Link>
+              <Link to="/signup" style={{ background: 'white', color: '#16a34a', padding: '6px 16px', borderRadius: 6, textDecoration: 'none', fontWeight: 700 }}>Sign Up</Link>
             </>
           )}
         </div>
@@ -32,43 +33,41 @@ function Navbar({ user, onLogout }) {
 }
 
 function Landing() {
-  const [stats, setStats] = useState({ listings: 0, merchants: 0, orders: 0 });
+  const [stats, setStats] = useState({ active_listings: 0, total_merchants: 0, orders_completed: 0 });
   useEffect(() => {
-    api.get('/api/stats').then(setStats).catch(() => {});
+    api.getStats().then(s => setStats(s)).catch(() => {});
   }, []);
   return (
-    <div className="min-h-screen bg-green-50">
-      <div className="bg-green-600 text-white py-20 px-4 text-center">
-        <h1 className="text-5xl font-bold mb-4">Stop Food Waste. Start Earning.</h1>
-        <p className="text-xl mb-8">Connect surplus food from restaurants and bakeries to buyers who need it.</p>
-        <Link to="/signup" className="bg-white text-green-600 px-8 py-3 rounded-lg font-bold text-lg hover:bg-green-100">
-          Get Started Free
-        </Link>
+    <div style={{ minHeight: '100vh', background: '#f0fdf4' }}>
+      <div style={{ background: 'linear-gradient(135deg, #16a34a, #15803d)', color: 'white', padding: '80px 20px', textAlign: 'center' }}>
+        <h1 style={{ fontSize: 56, fontWeight: 800, marginBottom: 20, lineHeight: 1.1, margin: '0 0 20px' }}>Stop Food Waste. Start Earning.</h1>
+        <p style={{ fontSize: 22, marginBottom: 40, opacity: 0.95 }}>Connect surplus food from restaurants and bakeries to buyers who need it.</p>
+        <Link to="/signup" style={{ background: 'white', color: '#16a34a', padding: '18px 40px', borderRadius: 8, fontWeight: 700, fontSize: 18, textDecoration: 'none', display: 'inline-block' }}>Get Started Free</Link>
       </div>
-      <div className="container mx-auto py-16 px-4">
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
-            <div className="text-4xl mb-4">🍞</div>
-            <h3 className="text-xl font-bold mb-2">For Merchants</h3>
-            <p>List surplus food before it goes bad. Turn waste into revenue.</p>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 30, marginBottom: 40 }}>
+          <div style={{ background: 'white', padding: 30, borderRadius: 12, textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🍞</div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, color: '#15803d', margin: '0 0 12px' }}>For Merchants</h3>
+            <p style={{ margin: 0 }}>List surplus food before it goes bad. Turn waste into revenue.</p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
-            <div className="text-4xl mb-4">🏭</div>
-            <h3 className="text-xl font-bold mb-2">For Buyers</h3>
-            <p>Get quality food at 50-80% off. Caterers, food banks, manufacturers.</p>
+          <div style={{ background: 'white', padding: 30, borderRadius: 12, textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🏭</div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, color: '#15803d', margin: '0 0 12px' }}>For Buyers</h3>
+            <p style={{ margin: 0 }}>Get quality food at 50-80% off. Caterers, food banks, manufacturers.</p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
-            <div className="text-4xl mb-4">🌍</div>
-            <h3 className="text-xl font-bold mb-2">For the Planet</h3>
-            <p>Every dollar saved is food rescued. Join the zero-waste movement.</p>
+          <div style={{ background: 'white', padding: 30, borderRadius: 12, textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🌍</div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, color: '#15803d', margin: '0 0 12px' }}>For the Planet</h3>
+            <p style={{ margin: 0 }}>Every dollar saved is food rescued. Join the zero-waste movement.</p>
           </div>
         </div>
-        <div className="bg-green-100 p-8 rounded-lg text-center">
-          <h2 className="text-2xl font-bold mb-4">Live Marketplace Stats</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div><div className="text-3xl font-bold text-green-600">{stats.listings}</div><div>Active Listings</div></div>
-            <div><div className="text-3xl font-bold text-green-600">{stats.merchants}</div><div>Merchants</div></div>
-            <div><div className="text-3xl font-bold text-green-600">{stats.orders}</div><div>Completed Orders</div></div>
+        <div style={{ background: '#dcfce7', padding: 40, borderRadius: 12, textAlign: 'center' }}>
+          <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 24 }}>Live Marketplace</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 30 }}>
+            <div><div style={{ fontSize: 40, fontWeight: 800, color: '#16a34a' }}>{stats.active_listings}</div><div>Active Listings</div></div>
+            <div><div style={{ fontSize: 40, fontWeight: 800, color: '#16a34a' }}>{stats.total_merchants}</div><div>Merchants</div></div>
+            <div><div style={{ fontSize: 40, fontWeight: 800, color: '#16a34a' }}>{stats.orders_completed}</div><div>Completed Orders</div></div>
           </div>
         </div>
       </div>
@@ -77,13 +76,14 @@ function Landing() {
 }
 
 function Login({ setUser }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('baker@demo.com');
+  const [password, setPassword] = useState('demo123');
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { user } = await api.post('/api/auth/login', { email, password });
+      const { token, user } = await api.login({ email, password });
+      localStorage.setItem(STORE_KEY, token);
       setUser(user);
       toast.success('Welcome back!');
       navigate('/browse');
@@ -92,25 +92,25 @@ function Login({ setUser }) {
     }
   };
   return (
-    <div className="min-h-screen bg-green-50 flex items-center justify-center px-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login to WasteZero</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-2 border rounded" required />
+    <div style={{ minHeight: '100vh', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ background: 'white', padding: 40, borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', width: '100%', maxWidth: 440 }}>
+        <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 24, textAlign: 'center' }}>Login to WasteZero</h2>
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 16 }} required />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full p-2 border rounded" required />
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Password</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 16 }} required />
           </div>
-          <button type="submit" className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Login</button>
+          <button type="submit" style={{ width: '100%', background: '#16a34a', color: 'white', padding: 12, border: 'none', borderRadius: 6, fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>Login</button>
         </form>
-        <p className="mt-4 text-center text-sm">Don't have an account? <Link to="/signup" className="text-green-600">Sign up</Link></p>
-        <div className="mt-4 p-4 bg-green-50 rounded text-sm">
-          <p className="font-bold">Demo Accounts:</p>
-          <p>Merchant: baker@demo.com / demo123</p>
-          <p>Buyer: cafe@demo.com / demo123</p>
+        <p style={{ marginTop: 20, textAlign: 'center', fontSize: 14 }}>Don't have an account? <Link to="/signup" style={{ color: '#16a34a' }}>Sign up</Link></p>
+        <div style={{ marginTop: 20, padding: 16, background: '#f0fdf4', borderRadius: 6, fontSize: 13 }}>
+          <p style={{ fontWeight: 700, margin: '0 0 8px' }}>Demo Accounts:</p>
+          <p style={{ margin: '4px 0' }}>Merchant: baker@demo.com / demo123</p>
+          <p style={{ margin: '4px 0' }}>Buyer: cafe@demo.com / demo123</p>
         </div>
       </div>
     </div>
@@ -126,7 +126,8 @@ function Signup({ setUser }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { user } = await api.post('/api/auth/signup', { name, email, password, role });
+      const { token, user } = await api.signup({ name, email, password, role });
+      localStorage.setItem(STORE_KEY, token);
       setUser(user);
       toast.success('Account created!');
       navigate(role === 'merchant' ? '/create' : '/browse');
@@ -135,39 +136,38 @@ function Signup({ setUser }) {
     }
   };
   return (
-    <div className="min-h-screen bg-green-50 flex items-center justify-center px-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Join WasteZero</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Your Name / Business</label>
-            <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 border rounded" required />
+    <div style={{ minHeight: '100vh', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ background: 'white', padding: 40, borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', width: '100%', maxWidth: 440 }}>
+        <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 24, textAlign: 'center' }}>Join WasteZero</h2>
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Your Name / Business</label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)} style={{ width: '100%', padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 16 }} required />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-2 border rounded" required />
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 16 }} required />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full p-2 border rounded" required />
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Password</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 16 }} required />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">I want to...</label>
-            <div className="grid grid-cols-2 gap-4">
-              <button type="button" onClick={() => setRole('buyer')} className={`p-3 rounded border ${role === 'buyer' ? 'border-green-500 bg-green-50' : ''}`}>
-                <div className="font-bold">Buy Food</div>
-                <div className="text-sm text-gray-600">Find deals</div>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 8 }}>I want to...</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <button type="button" onClick={() => setRole('buyer')} style={{ padding: 12, border: role === 'buyer' ? '2px solid #16a34a' : '1px solid #d1d5db', background: role === 'buyer' ? '#f0fdf4' : 'white', borderRadius: 6, cursor: 'pointer' }}>
+                <div style={{ fontWeight: 700 }}>Buy Food</div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>Find deals</div>
               </button>
-              <button type="button" onClick={() => setRole('merchant')} className={`p-3 rounded border ${role === 'merchant' ? 'border-green-500 bg-green-50' : ''}`}>
-                <div className="font-bold">Sell Food</div>
-                <div className="text-sm text-gray-600">List surplus</div>
+              <button type="button" onClick={() => setRole('merchant')} style={{ padding: 12, border: role === 'merchant' ? '2px solid #16a34a' : '1px solid #d1d5db', background: role === 'merchant' ? '#f0fdf4' : 'white', borderRadius: 6, cursor: 'pointer' }}>
+                <div style={{ fontWeight: 700 }}>Sell Food</div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>List surplus</div>
               </button>
             </div>
           </div>
-          <input type="hidden" value={role} />
-          <button type="submit" className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Create Account</button>
+          <button type="submit" style={{ width: '100%', background: '#16a34a', color: 'white', padding: 12, border: 'none', borderRadius: 6, fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>Create Account</button>
         </form>
-        <p className="mt-4 text-center text-sm">Already have an account? <Link to="/login" className="text-green-600">Login</Link></p>
+        <p style={{ marginTop: 20, textAlign: 'center', fontSize: 14 }}>Already have an account? <Link to="/login" style={{ color: '#16a34a' }}>Login</Link></p>
       </div>
     </div>
   );
@@ -177,8 +177,9 @@ function Browse({ user }) {
   const [listings, setListings] = useState([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    api.get('/api/listings').then(data => setListings(data)).catch(console.error);
+    api.getListings().then(d => { setListings(d.listings || []); setLoading(false); }).catch(() => setLoading(false));
   }, []);
   const filtered = listings.filter(l => {
     if (search && !l.title.toLowerCase().includes(search.toLowerCase())) return false;
@@ -188,31 +189,23 @@ function Browse({ user }) {
   const handleBuy = async (listing) => {
     if (!user) { toast.error('Please login first'); return; }
     try {
-      // Try Stripe checkout first
-      const { url } = await api.createPaymentIntent({ listing_id: listing.id, quantity: 1 });
-      if (url) {
-        window.location.href = url;
-      } else {
-        // Fallback to demo order
-        await api.createOrder({ listing_id: listing.id, quantity: 1 });
-        toast.success('Order placed! Check your orders page.');
-      }
+      const res = await api.createPaymentIntent({ listing_id: listing.id, quantity: 1 });
+      if (res.url) { window.location.href = res.url; return; }
+      await api.createOrder({ listing_id: listing.id, quantity: 1 });
+      toast.success('Order placed! Check your orders page.');
     } catch (err) {
-      // Fallback to demo if Stripe not configured
       try {
         await api.createOrder({ listing_id: listing.id, quantity: 1 });
-        toast.success('Order placed (demo mode)! Check your orders page.');
-      } catch (e2) {
-        toast.error(e2.message || 'Failed to place order');
-      }
+        toast.success('Order placed (demo)! Check orders page.');
+      } catch (e2) { toast.error(e2.message || 'Failed'); }
     }
   };
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6">Browse Surplus Food</h1>
-      <div className="flex gap-4 mb-6">
-        <input type="text" placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} className="flex-1 p-2 border rounded" />
-        <select value={category} onChange={e => setCategory(e.target.value)} className="p-2 border rounded">
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 20px' }}>
+      <h1 style={{ fontSize: 36, fontWeight: 800, marginBottom: 24 }}>Browse Surplus Food</h1>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 30 }}>
+        <input type="text" placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} style={{ flex: 1, padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 16 }} />
+        <select value={category} onChange={e => setCategory(e.target.value)} style={{ padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 16 }}>
           <option value="">All Categories</option>
           <option value="baked">Baked Goods</option>
           <option value="prepared">Prepared Food</option>
@@ -221,68 +214,54 @@ function Browse({ user }) {
           <option value="other">Other</option>
         </select>
       </div>
-      <div className="grid md:grid-cols-3 gap-6">
-        {filtered.map(listing => (
-          <div key={listing.id} className="bg-white p-4 rounded-lg shadow-md">
-            <div className="h-40 bg-gray-200 rounded mb-4 flex items-center justify-center text-6xl">
-              {listing.category === 'baked' ? '🍞' : listing.category === 'prepared' ? '🍲' : listing.category === 'produce' ? '🥬' : '📦'}
+      {loading ? <p>Loading...</p> : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+          {filtered.map(listing => (
+            <div key={listing.id} style={{ background: 'white', padding: 20, borderRadius: 12, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+              <div style={{ height: 160, background: '#e5e7eb', borderRadius: 8, marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 64 }}>
+                {listing.category === 'baked' ? '🍞' : listing.category === 'prepared' ? '🍲' : listing.category === 'produce' ? '🥬' : '📦'}
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 8px' }}>{listing.title}</h3>
+              <p style={{ color: '#6b7280', fontSize: 14, margin: '0 0 12px' }}>{listing.description}</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                <span style={{ color: '#16a34a', fontWeight: 700, fontSize: 20 }}>${listing.price}</span>
+                <span style={{ color: '#6b7280', fontSize: 14 }}>{listing.quantity} available</span>
+              </div>
+              <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>📍 {listing.pickup_location}</div>
+              <button onClick={() => handleBuy(listing)} style={{ width: '100%', background: '#16a34a', color: 'white', padding: 10, border: 'none', borderRadius: 6, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Buy Now</button>
             </div>
-            <h3 className="font-bold text-lg">{listing.title}</h3>
-            <p className="text-gray-600 text-sm mb-2">{listing.description}</p>
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-green-600 font-bold">${listing.price}</span>
-              <span className="text-sm text-gray-500">{listing.quantity} available</span>
-            </div>
-            <div className="text-sm text-gray-500 mb-3">Pickup: {listing.pickup_location}</div>
-            <button onClick={() => handleBuy(listing)} className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
-              Buy Now
-            </button>
-          </div>
-        ))}
-      </div>
-      {filtered.length === 0 && <p className="text-center text-gray-500 mt-8">No listings found. Try different filters.</p>}
+          ))}
+        </div>
+      )}
+      {!loading && filtered.length === 0 && <p style={{ textAlign: 'center', color: '#6b7280', marginTop: 40 }}>No listings found. Try different filters.</p>}
     </div>
   );
 }
 
 function CreateListing({ user }) {
-  const [form, setForm] = useState({ title: '', description: '', price: '', quantity: '', category: 'baked', pickup_location: '', pickup_window: '' });
+  const [form, setForm] = useState({ title: '', description: '', price: '', quantity: '', category: 'baked', pickup_location: '' });
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/api/listings', { ...form, price: parseFloat(form.price), quantity: parseInt(form.quantity) });
+      await api.createListing({ ...form, price: parseFloat(form.price), quantity: parseInt(form.quantity) });
       toast.success('Listing created!');
       navigate('/my-listings');
-    } catch (err) {
-      toast.error(err.message || 'Failed to create listing');
-    }
+    } catch (err) { toast.error(err.message || 'Failed to create listing'); }
   };
   return (
-    <div className="container mx-auto py-8 px-4 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-6">List Surplus Food</h1>
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Title</label>
-          <input type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full p-2 border rounded" placeholder="e.g., Day-old sourdough bread" required />
+    <div style={{ maxWidth: 700, margin: '0 auto', padding: '40px 20px' }}>
+      <h1 style={{ fontSize: 36, fontWeight: 800, marginBottom: 24 }}>List Surplus Food</h1>
+      <form onSubmit={handleSubmit} style={{ background: 'white', padding: 30, borderRadius: 12, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <Field label="Title" value={form.title} onChange={v => setForm({...form, title: v})} placeholder="e.g., Day-old sourdough bread" />
+        <Field label="Description" value={form.description} onChange={v => setForm({...form, description: v})} placeholder="Describe the food..." textarea />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <Field label="Price ($)" value={form.price} onChange={v => setForm({...form, price: v})} type="number" />
+          <Field label="Quantity" value={form.quantity} onChange={v => setForm({...form, quantity: v})} type="number" />
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
-          <textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full p-2 border rounded" rows="3" placeholder="Describe the food..." required />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Price ($)</label>
-            <input type="number" step="0.01" value={form.price} onChange={e => setForm({...form, price: e.target.value})} className="w-full p-2 border rounded" required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Quantity</label>
-            <input type="number" value={form.quantity} onChange={e => setForm({...form, quantity: e.target.value})} className="w-full p-2 border rounded" required />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Category</label>
-          <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="w-full p-2 border rounded">
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Category</label>
+          <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} style={{ width: '100%', padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 16 }}>
             <option value="baked">Baked Goods</option>
             <option value="prepared">Prepared Food</option>
             <option value="produce">Produce</option>
@@ -290,57 +269,56 @@ function CreateListing({ user }) {
             <option value="other">Other</option>
           </select>
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Pickup Location</label>
-          <input type="text" value={form.pickup_location} onChange={e => setForm({...form, pickup_location: e.target.value})} className="w-full p-2 border rounded" placeholder="Address or area" required />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Pickup Window</label>
-          <input type="text" value={form.pickup_window} onChange={e => setForm({...form, pickup_window: e.target.value})} className="w-full p-2 border rounded" placeholder="e.g., Today 2-6 PM" required />
-        </div>
-        <button type="submit" className="w-full bg-green-600 text-white py-3 rounded hover:bg-green-700 font-bold">Create Listing</button>
+        <Field label="Pickup Location" value={form.pickup_location} onChange={v => setForm({...form, pickup_location: v})} placeholder="Address or area" />
+        <button type="submit" style={{ width: '100%', background: '#16a34a', color: 'white', padding: 14, border: 'none', borderRadius: 6, fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>Create Listing</button>
       </form>
+    </div>
+  );
+}
+
+function Field({ label, value, onChange, type = 'text', placeholder, textarea }) {
+  const style = { width: '100%', padding: 10, border: '1px solid #d1d5db', borderRadius: 6, fontSize: 16, marginBottom: 16, fontFamily: 'inherit' };
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 6 }}>{label}</label>
+      {textarea ? <textarea value={value} onChange={e => onChange(e.target.value)} style={{ ...style, minHeight: 80 }} placeholder={placeholder} required /> : <input type={type} value={value} onChange={e => onChange(e.target.value)} style={style} placeholder={placeholder} required />}
     </div>
   );
 }
 
 function MyListings({ user }) {
   const [listings, setListings] = useState([]);
-  const [offers, setOffers] = useState([]);
   useEffect(() => {
-    api.get('/api/listings').then(data => setListings(data.filter(l => l.seller_id === user?.id))).catch(console.error);
-    api.get('/api/offers/listing/all').then(setOffers).catch(() => setOffers([]));
+    api.getListings().then(d => setListings((d.listings || []).filter(l => l.merchant_id === user?.id))).catch(() => {});
   }, [user]);
   const handleDelete = async (id) => {
     if (!confirm('Delete this listing?')) return;
     try {
-      await api.delete(`/api/listings/${id}`);
+      await api.deleteListing(id);
       setListings(listings.filter(l => l.id !== id));
       toast.success('Listing deleted');
-    } catch (err) {
-      toast.error('Failed to delete');
-    }
+    } catch (err) { toast.error('Failed to delete'); }
   };
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">My Listings</h1>
-        <Link to="/create" className="bg-green-600 text-white px-4 py-2 rounded">+ New Listing</Link>
+    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '40px 20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h1 style={{ fontSize: 36, fontWeight: 800, margin: 0 }}>My Listings</h1>
+        <Link to="/create" style={{ background: '#16a34a', color: 'white', padding: '10px 20px', borderRadius: 6, textDecoration: 'none', fontWeight: 700 }}>+ New Listing</Link>
       </div>
       {listings.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow">
-          <p className="text-gray-500 mb-4">No listings yet</p>
-          <Link to="/create" className="text-green-600 hover:underline">Create your first listing</Link>
+        <div style={{ textAlign: 'center', padding: 60, background: 'white', borderRadius: 12 }}>
+          <p style={{ color: '#6b7280', marginBottom: 16 }}>No listings yet</p>
+          <Link to="/create" style={{ color: '#16a34a' }}>Create your first listing</Link>
         </div>
       ) : (
-        <div className="space-y-4">
-          {listings.map(listing => (
-            <div key={listing.id} className="bg-white p-4 rounded-lg shadow flex justify-between items-center">
+        <div style={{ display: 'grid', gap: 12 }}>
+          {listings.map(l => (
+            <div key={l.id} style={{ background: 'white', padding: 20, borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h3 className="font-bold">{listing.title}</h3>
-                <p className="text-gray-600">${listing.price} • {listing.quantity} left • {listing.status}</p>
+                <h3 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 4px' }}>{l.title}</h3>
+                <p style={{ color: '#6b7280', margin: 0 }}>${l.price} • {l.quantity} left • {l.status}</p>
               </div>
-              <button onClick={() => handleDelete(listing.id)} className="text-red-500 hover:underline">Delete</button>
+              <button onClick={() => handleDelete(l.id)} style={{ color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }}>Delete</button>
             </div>
           ))}
         </div>
@@ -351,54 +329,30 @@ function MyListings({ user }) {
 
 function Orders({ user }) {
   const [orders, setOrders] = useState([]);
-  useEffect(() => {
-    api.get('/api/orders').then(data => setOrders(data)).catch(console.error);
-  }, []);
-  const myOrders = orders.filter(o => o.buyer_id === user?.id || o.seller_id === user?.id);
-  const handleConfirm = async (orderId) => {
-    try {
-      await api.post(`/api/orders/${orderId}/confirm`);
-      toast.success('Order confirmed!');
-      setOrders(orders.map(o => o.id === orderId ? { ...o, status: 'paid' } : o));
-    } catch (err) {
-      toast.error('Failed to confirm');
-    }
-  };
-  const handleComplete = async (orderId) => {
-    try {
-      await api.put(`/api/orders/${orderId}/complete`);
-      toast.success('Order completed!');
-      setOrders(orders.map(o => o.id === orderId ? { ...o, status: 'completed' } : o));
-    } catch (err) {
-      toast.error('Failed to complete');
-    }
+  useEffect(() => { api.getOrders().then(d => setOrders(d.orders || [])).catch(() => {}); }, []);
+  const myOrders = orders.filter(o => o.buyer_id === user?.id || o.merchant_id === user?.id);
+  const handleConfirm = async (id) => {
+    try { await api.confirmOrder(id); toast.success('Order confirmed!'); setOrders(orders.map(o => o.id === id ? { ...o, status: 'paid' } : o)); }
+    catch (err) { toast.error('Failed to confirm'); }
   };
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6">Orders</h1>
+    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '40px 20px' }}>
+      <h1 style={{ fontSize: 36, fontWeight: 800, marginBottom: 24 }}>Orders</h1>
       {myOrders.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow">
-          <p className="text-gray-500">No orders yet</p>
+        <div style={{ textAlign: 'center', padding: 60, background: 'white', borderRadius: 12 }}>
+          <p style={{ color: '#6b7280' }}>No orders yet</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {myOrders.map(order => (
-            <div key={order.id} className="bg-white p-4 rounded-lg shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold">Order #{order.id}</h3>
-                  <p className="text-gray-600">Total: ${order.total}</p>
-                  <p className="text-sm text-gray-500">Status: <span className="font-bold capitalize">{order.status}</span></p>
-                </div>
-                <div className="space-x-2">
-                  {user?.role === 'merchant' && order.status === 'pending' && (
-                    <button onClick={() => handleConfirm(order.id)} className="bg-green-600 text-white px-3 py-1 rounded text-sm">Confirm Payment</button>
-                  )}
-                  {user?.role === 'merchant' && order.status === 'paid' && (
-                    <button onClick={() => handleComplete(order.id)} className="bg-blue-600 text-white px-3 py-1 rounded text-sm">Mark Complete</button>
-                  )}
-                </div>
+        <div style={{ display: 'grid', gap: 12 }}>
+          {myOrders.map(o => (
+            <div key={o.id} style={{ background: 'white', padding: 20, borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px' }}>{o.title || 'Order #' + o.id}</h3>
+                <p style={{ color: '#6b7280', margin: 0, fontSize: 14 }}>Total: ${o.amount} • Status: <strong style={{ textTransform: 'capitalize' }}>{o.status}</strong></p>
               </div>
+              {user?.role === 'merchant' && o.status === 'pending' && (
+                <button onClick={() => handleConfirm(o.id)} style={{ background: '#16a34a', color: 'white', border: 'none', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontSize: 14 }}>Confirm Payment</button>
+              )}
             </div>
           ))}
         </div>
@@ -407,17 +361,18 @@ function Orders({ user }) {
   );
 }
 
-function App() {
+export default function App() {
   const [user, setUser] = useState(null);
+  const [loaded, setLoaded] = useState(false);
   const location = useLocation();
   useEffect(() => {
-    api.get('/api/auth/me').then(setUser).catch(() => setUser(null));
+    const token = localStorage.getItem(STORE_KEY);
+    if (token) {
+      api.me().then(u => { setUser(u.user); setLoaded(true); }).catch(() => setLoaded(true));
+    } else { setLoaded(true); }
   }, []);
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    toast.success('Logged out');
-  };
+  const handleLogout = () => { localStorage.removeItem(STORE_KEY); setUser(null); toast.success('Logged out'); };
+  if (!loaded) return <div style={{ padding: 40, textAlign: 'center' }}>Loading WasteZero...</div>;
   const showNavbar = !['/', '/login', '/signup'].includes(location.pathname);
   return (
     <>
@@ -431,9 +386,6 @@ function App() {
         <Route path="/my-listings" element={user ? <MyListings user={user} /> : <Landing />} />
         <Route path="/orders" element={user ? <Orders user={user} /> : <Landing />} />
       </Routes>
-      <Toaster position="top-right" />
     </>
   );
 }
-
-export default App;
